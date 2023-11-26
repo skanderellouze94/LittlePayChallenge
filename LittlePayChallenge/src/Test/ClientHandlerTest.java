@@ -11,7 +11,7 @@ public class ClientHandlerTest {
 
   @Test
   public void testParseTransmition() throws Exception {
-    ClientHandler clientHandler = new ClientHandler(null);  // Pass a real Socket if needed
+    ClientHandler clientHandler = new ClientHandler(null);
 
     // Test case 1: Test with a one message
     String input1 = "001B02189F2A01029F020201005A0841111111111111115F2A02097803";

@@ -1,6 +1,9 @@
 package Client;
 
 
+import static Utils.HexConverterUtil.cleanHex;
+import static Utils.HexConverterUtil.toHex;
+
 import DTO.Message;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +35,6 @@ public class ClientHandler implements Runnable {
       while ((inputLine = in.readLine()) != null) {
 
         List<Message> messages = parseTransmition(cleanHex(toHex(inputLine.getBytes())));
-        System.out.println(cleanHex(toHex(inputLine.getBytes())));
 
         for (Message message : messages) {
           out.println("Kernel: " + message.getKernel());
@@ -132,18 +134,4 @@ public class ClientHandler implements Runnable {
         return index;
     }
   }
-
-  private String toHex(byte[] bytes) {
-    StringBuilder hexStringBuilder = new StringBuilder();
-    for (byte b : bytes) {
-      hexStringBuilder.append(String.format("%02X", b));
-    }
-    return hexStringBuilder.toString();
-  }
-  private static String cleanHex(String hex) {
-    hex = hex.replaceAll("EFBFBD", "9F");
-    hex = hex.toLowerCase();
-    return hex;
-  }
-
 }
