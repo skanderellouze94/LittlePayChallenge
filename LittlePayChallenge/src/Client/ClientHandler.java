@@ -34,7 +34,9 @@ public class ClientHandler implements Runnable {
 
       while ((inputLine = in.readLine()) != null) {
 
-        List<Message> messages = parseTransmition(cleanHex(toHex(inputLine.getBytes())));
+        String Transmission = cleanHex(toHex(inputLine.getBytes()));
+
+        List<Message> messages = parseTransmission(Transmission);
 
         for (Message message : messages) {
           out.println("Kernel: " + message.getKernel());
@@ -56,11 +58,11 @@ public class ClientHandler implements Runnable {
     }
   }
 
-  public List<Message> parseTransmition(String receivedData) throws Exception {
+  public List<Message> parseTransmission(String receivedData) throws Exception {
     if (receivedData != null) {
       receivedData = receivedData.toUpperCase(Locale.ROOT);
     } else {
-      throw new Exception("Transmition data should not be null or empty");
+      throw new Exception("Transmission data should not be null or empty");
     }
     receivedData = receivedData.toUpperCase(Locale.ROOT);
     List<Message> messages = new ArrayList<>();
@@ -68,6 +70,11 @@ public class ClientHandler implements Runnable {
 
     int index =
         receivedData.length() >= 7 && receivedData.substring(0, 7).lastIndexOf("02") == 4 ? 4 : 5;
+    int transmissionSize = Integer.parseInt(receivedData.substring(0, index), 16) * 2;
+
+    if (transmissionSize != receivedData.length() - index) {
+      throw new Exception("Transmission is inaccurate");
+    }
 
     while (index < receivedData.length()) {
       if (receivedData.length() >= 2 + index) {
@@ -78,7 +85,7 @@ public class ClientHandler implements Runnable {
         String tagTwoByte = receivedData.substring(index, index + 4);
         index = manageTwoByteTag(tagTwoByte, receivedData, index, message);
       }
-      if ((receivedData.length() == 1-index) || (receivedData.length() == 1+index)) {
+      if ((receivedData.length() == 1 - index) || (receivedData.length() == 1 + index)) {
         index++;
       }
     }

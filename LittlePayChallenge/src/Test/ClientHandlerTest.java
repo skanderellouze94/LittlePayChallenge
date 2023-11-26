@@ -1,21 +1,22 @@
 package Test;
 
-import Client.ClientHandler;
-import DTO.Message;
-import org.junit.Test;
-import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+
+import Client.ClientHandler;
+import DTO.Message;
+import java.util.List;
+import org.junit.Test;
 
 public class ClientHandlerTest {
 
   @Test
-  public void testParseTransmition() throws Exception {
+  public void testParseTransmission() throws Exception {
     ClientHandler clientHandler = new ClientHandler(null);
 
     // Test case 1: Test with a one message
     String input1 = "001B02189F2A01029F020201005A0841111111111111115F2A02097803";
-    List<Message> result1 = clientHandler.parseTransmition(input1);
+    List<Message> result1 = clientHandler.parseTransmission(input1);
     assertEquals(1, result1.size());
     assertEquals("02", result1.get(0).getKernel());
     assertEquals("4111111111111111", result1.get(0).getCardNumber());
@@ -23,8 +24,9 @@ public class ClientHandlerTest {
     assertEquals("0978", result1.get(0).getCurrency());
 
     // Test case 2: Test with multiple messages
-    String input2 = "004202189F2A01029F020201005A0841111111111111115F2A0209780302249F2A0804000000000000005F2A0208269F02031234565A08379F9F246310005F9F03010003";
-    List<Message> result2 = clientHandler.parseTransmition(input2);
+    String input2 = "004202189F2A01029F020201005A0841111111111111115F2A0209780302249F2A080"
+        + "4000000000000005F2A0208269F02031234565A08379F9F246310005F9F03010003";
+    List<Message> result2 = clientHandler.parseTransmission(input2);
     assertEquals(2, result2.size());
     assertEquals("02", result2.get(0).getKernel());
     assertEquals("4111111111111111", result2.get(0).getCardNumber());
@@ -38,12 +40,13 @@ public class ClientHandlerTest {
 
     // Test case for an empty input
     assertThrows(Exception.class, () -> {
-      clientHandler.parseTransmition(null);
+      clientHandler.parseTransmission(null);
     });
 
     // Test case for invalid input
-    String invalidInput = "invalidInput";
-    List<Message> invalidResult = clientHandler.parseTransmition(invalidInput);
-    assertEquals(0, invalidResult.size());
+    assertThrows(Exception.class, () -> {
+      clientHandler.parseTransmission("ABsCGJ8qAQKfAgIBAFoIQRERERERERFfKgIJeAM=");
+    });
+
   }
 }
