@@ -1,8 +1,11 @@
 package Client;
 
 
+import static Utils.DataMapper.getCurrencyName;
 import static Utils.HexConverterUtil.cleanHex;
 import static Utils.HexConverterUtil.toHex;
+import static Utils.DataMapper.getKernelName;
+import static Utils.ReformatCardNumber.reformatCardNumber;
 
 import DTO.Message;
 import java.io.BufferedReader;
@@ -111,7 +114,7 @@ public class ClientHandler implements Runnable {
         return processEndTag(index, messages, message);
       case "5A":
         int valueLength = Integer.parseInt(receivedData.substring(index + 2, index + 4), 16) * 2;
-        message.setCardNumber(receivedData.substring(index + 4, index + 4 + valueLength));
+        message.setCardNumber(reformatCardNumber(receivedData.substring(index + 4, index + 4 + valueLength)));
         return index + 4 + valueLength;
       default:
         return index + 2;
@@ -126,14 +129,14 @@ public class ClientHandler implements Runnable {
 
     switch (tagTwoByte) {
       case "9F2A":
-        message.setKernel(receivedData.substring(index + 6, index + 6 + valueLength));
+        message.setKernel(getKernelName(receivedData.substring(index + 6, index + 6 + valueLength)));
         return index + 4 + valueLength;
       case "9F02":
         message.setAmount(
             Double.parseDouble(receivedData.substring(index + 6, index + 6 + valueLength)) / 100);
         return index + 4 + valueLength;
       case "5F2A":
-        message.setCurrency(receivedData.substring(index + 6, index + 6 + valueLength));
+        message.setCurrency(getCurrencyName(receivedData.substring(index + 6, index + 6 + valueLength)));
         return index + 4 + valueLength;
       case "9F03":
         return index + 4 + valueLength;
