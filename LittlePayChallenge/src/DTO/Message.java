@@ -1,7 +1,5 @@
 package DTO;
 
-import lombok.Data;
-
 public class Message {
   private String kernel;
   private String cardNumber;
@@ -48,6 +46,5 @@ public class Message {
   }
 
   public Message() {
-
   }
 }
