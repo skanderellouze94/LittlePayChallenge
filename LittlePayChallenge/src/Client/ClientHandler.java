@@ -8,10 +8,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Base64;
 
 public class ClientHandler implements Runnable {
 
@@ -34,6 +32,7 @@ public class ClientHandler implements Runnable {
       while ((inputLine = in.readLine()) != null) {
 
         List<Message> messages = parseTransmition(cleanHex(toHex(inputLine.getBytes())));
+        System.out.println(cleanHex(toHex(inputLine.getBytes())));
 
         for (Message message : messages) {
           out.println("Kernel: " + message.getKernel());
@@ -44,7 +43,7 @@ public class ClientHandler implements Runnable {
         }
       }
 
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     } finally {
       try {
@@ -55,16 +54,21 @@ public class ClientHandler implements Runnable {
     }
   }
 
-  List<Message> parseTransmition(String receivedData) {
-
+  public List<Message> parseTransmition(String receivedData) throws Exception {
+    if (receivedData != null) {
+      receivedData = receivedData.toUpperCase(Locale.ROOT);
+    } else {
+      throw new Exception("Transmition data should not be null or empty");
+    }
     receivedData = receivedData.toUpperCase(Locale.ROOT);
     List<Message> messages = new ArrayList<>();
     Message message = new Message();
 
-    int index = (receivedData.substring(0, 7).lastIndexOf("02") == 4) ? 4 : 5;
+    int index =
+        receivedData.length() >= 7 && receivedData.substring(0, 7).lastIndexOf("02") == 4 ? 4 : 5;
 
     while (index < receivedData.length()) {
-      if (receivedData.length() >= index + 2) {
+      if (receivedData.length() >= 2 + index) {
         String tagOneByte = receivedData.substring(index, index + 2);
         index = manageOneByteTag(tagOneByte, receivedData, index, messages, message);
       }
@@ -72,7 +76,7 @@ public class ClientHandler implements Runnable {
         String tagTwoByte = receivedData.substring(index, index + 4);
         index = manageTwoByteTag(tagTwoByte, receivedData, index, message);
       }
-      if ((receivedData.length() == 1-index)) {
+      if ((receivedData.length() == 1-index) || (receivedData.length() == 1+index)) {
         index++;
       }
     }
